@@ -1,22 +1,24 @@
 using UnityEngine;
-using TMPro; // テキスト操作に必要
+using TMPro;
 
 public class CardController : MonoBehaviour
 {
-  // TypeScriptのプロパティのようなもの
-  public string suit; // マーク
-  public int rank;    // 数字
-  public TextMeshProUGUI cardText; // 画面上のテキスト
+  public TextMeshProUGUI cardText;
 
-  // 起動時に呼ばれる
-  void Start()
+  // CardDataを受け取って表示を更新するメソッド
+  public void SetCard(CardData data)
   {
-    DisplayCard();
-  }
+    // データの数字とマークをテキストに反映
+    cardText.text = data.suit + "\n" + data.rank;
 
-  // 表示を更新するメソッド
-  public void DisplayCard()
-  {
-    cardText.text = suit + "\n" + rank;
+    // もしマークが赤系なら文字色を変える、といった処理もここでできます
+    if (data.suit == "♥" || data.suit == "♦")
+    {
+      cardText.color = Color.red;
+    }
+    else
+    {
+      cardText.color = Color.black;
+    }
   }
 }
