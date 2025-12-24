@@ -1,24 +1,14 @@
 using UnityEngine;
-using TMPro;
+// テキスト表示の機能は削除します
 
 public class CardController : MonoBehaviour
 {
-  public TextMeshProUGUI cardText;
+  // カードデータを保持しておく（後でゲームの判定などに使うため）
+  public CardData myData;
 
-  // CardDataを受け取って表示を更新するメソッド
   public void SetCard(CardData data)
   {
-    // データの数字とマークをテキストに反映
-    cardText.text = data.suit + "\n" + data.rank;
-
-    // もしマークが赤系なら文字色を変える、といった処理もここでできます
-    if (data.suit == "♥" || data.suit == "♦")
-    {
-      cardText.color = Color.red;
-    }
-    else
-    {
-      cardText.color = Color.black;
-    }
+    myData = data;
+    // 絵柄はプレハブですでに決まっているので、表示を変える処理は不要です
   }
 }
