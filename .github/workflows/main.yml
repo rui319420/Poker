@@ -1,4 +1,4 @@
-name: Deploy to GitHub Pages
+name: Build All (Windows & WebGL)
 
 on:
   push:
@@ -7,11 +7,63 @@ on:
 
 permissions:
   contents: write
-
 env:
   UNITY_VERSION: 6000.3.1f1
 
 jobs:
+  # --------------------------------------------------
+  # ジョブ1: Windows用ビルド & リリース作成
+  # --------------------------------------------------
+  buildWindows:
+    name: Build Windows
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          lfs: true
+
+      - name: Cache Library
+        uses: actions/cache@v3
+        with:
+          path: Library
+          key: Library-Windows-${{ hashFiles('Packages/packages-lock.json') }}
+          restore-keys: |
+            Library-Windows-
+            Library-
+
+      - name: Fix File Permissions
+        run: sudo chown -R $USER:$USER $GITHUB_WORKSPACE
+
+      - name: Build Windows
+        uses: game-ci/unity-builder@v4
+        env:
+          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+        with:
+          unityVersion: ${{ env.UNITY_VERSION }}
+          targetPlatform: StandaloneWindows64
+
+      - name: Zip Build
+        run: |
+          cd build/StandaloneWindows64
+          zip -r ../../MyPokerGame_Windows.zip .
+
+      - name: Upload to Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: MyPokerGame_Windows.zip
+          tag_name: latest
+          name: "Latest Build (Windows)"
+          body: "最新のWindows版ビルドです。"
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # --------------------------------------------------
+  # ジョブ2: WebGL用ビルド & Pagesデプロイ
+  # --------------------------------------------------
   buildWebGL:
     name: Build WebGL
     runs-on: ubuntu-latest
@@ -25,15 +77,15 @@ jobs:
         uses: actions/cache@v3
         with:
           path: Library
-          key: Library-${{ hashFiles('Packages/packages-lock.json') }}
+          key: Library-WebGL-${{ hashFiles('Packages/packages-lock.json') }}
           restore-keys: |
+            Library-WebGL-
             Library-
 
       - name: Fix File Permissions
-        run: |
-          sudo chown -R $USER:$USER $GITHUB_WORKSPACE
+        run: sudo chown -R $USER:$USER $GITHUB_WORKSPACE
 
-      - name: Build Project
+      - name: Build WebGL
         uses: game-ci/unity-builder@v4
         env:
           UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
