@@ -43,6 +43,8 @@ public class DeckManager : MonoBehaviour
 
   void DealCards(int count)
   {
+    float spacing = 1.5f;
+
     for (int i = 0; i < count; i++)
     {
       if (i >= deck.Count) break;
@@ -73,6 +75,9 @@ public class DeckManager : MonoBehaviour
       {
         // 3. カードを生成
         GameObject newCard = Instantiate(prefab, handParent);
+
+        float xPos = (i - (count - 1) / 2.0f) * spacing;
+        newCard.transform.localPosition = new Vector3(xPos, 0, 0);
 
         // 4. データをセット
         CardController controller = newCard.GetComponent<CardController>();
