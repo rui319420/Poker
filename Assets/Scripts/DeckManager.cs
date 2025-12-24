@@ -33,6 +33,8 @@ public class DeckManager : MonoBehaviour
       return;
     }
 
+    System.Array.Sort(currentCards, (a, b) => a.transform.position.x.CompareTo(b.transform.position.x));
+
     // --- ここから交換（ドロー）処理 ---
 
     // 1. デッキをリセットしてシャッフル
