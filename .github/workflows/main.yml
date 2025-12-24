@@ -1,4 +1,4 @@
-name: Build All (Windows & WebGL)
+name: Build Windows
 
 on:
   push:
@@ -12,9 +12,6 @@ env:
   UNITY_VERSION: 6000.3.1f1
 
 jobs:
-  # --------------------------------------------------
-  # ジョブ1: Windows用ビルド & リリース作成
-  # --------------------------------------------------
   buildWindows:
     name: Build Windows
     runs-on: ubuntu-latest
@@ -62,43 +59,3 @@ jobs:
           prerelease: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-  # --------------------------------------------------
-  # ジョブ2: WebGL用ビルド & Pagesデプロイ
-  # --------------------------------------------------
-  buildWebGL:
-    name: Build WebGL
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          lfs: true
-
-      - name: Cache Library
-        uses: actions/cache@v3
-        with:
-          path: Library
-          key: Library-WebGL-${{ hashFiles('Packages/packages-lock.json') }}
-          restore-keys: |
-            Library-WebGL-
-            Library-
-
-      - name: Fix File Permissions
-        run: sudo chown -R $USER:$USER $GITHUB_WORKSPACE
-
-      - name: Build WebGL
-        uses: game-ci/unity-builder@v4
-        env:
-          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
-          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
-          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
-        with:
-          unityVersion: ${{ env.UNITY_VERSION }}
-          targetPlatform: WebGL
-
-      - name: Deploy to GitHub Pages
-        uses: JamesIves/github-pages-deploy-action@v4
-        with:
-          folder: build/WebGL/WebGL
-          branch: gh-pages
